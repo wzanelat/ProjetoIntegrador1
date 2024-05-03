@@ -2,20 +2,22 @@ const express = require('express')
 const bodyParser = require('body-parser')
 require('dotenv').config()
 const app = express()
-const api = require('./rotas/index')
-const PORT = process.env.PORT
-
-console.log(process.env.MONGO_PASS)
-
 app.use(bodyParser.json())
+
+const api = require('./rotas/index')
 app.use('/api', api)
 
-app.get('/', (req,res)=>{
-    res.json({
-        success: true
+
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static('frontend/build'))
+
+    const path = require('path')
+    app.get('*',(req,res)=>{
+        res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
     })
-})
- 
+}
+
+const PORT = process.env.PORT
 app.listen(PORT)
 
 
